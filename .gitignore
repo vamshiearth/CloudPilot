@@ -1,0 +1,32 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+**/target/
+frontend/dist/
+
+# JVM crash and replay diagnostics
+hs_err_pid*.log
+replay_pid*.log
+
+# Local observability exports
+phase11-dashboard-*.json
+tempo-trace.json
+tempo-persistence-before.json
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+*.tfvars
+*.tfvars.json
+*.tfplan
+*-plan.txt
+
+.terraformrc
+terraform.rc

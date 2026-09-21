@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topic-init
+  namespace: cloudpilot
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app: kafka-topic-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-topic-init
+          image: apache/kafka:4.3.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for Kafka..."
+              until /opt/kafka/bin/kafka-topics.sh \
+                --bootstrap-server kafka:9092 \
+                --list >/dev/null 2>&1; do
+                sleep 3
+              done
+              echo "Kafka is ready."
+              /opt/kafka/bin/kafka-topics.sh \
+                --bootstrap-server kafka:9092 \
+                --create \
+                --if-not-exists \
+                --topic cloudpilot.events \
+                --partitions 3 \
+                --replication-factor 1
+              echo "cloudpilot.events is ready."

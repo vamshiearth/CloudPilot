@@ -1,0 +1,187 @@
+# ==================================================
+# Prometheus Configuration
+# ==================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: cloudpilot
+
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+
+      # --------------------------------------------
+      # Prometheus monitors itself
+      # --------------------------------------------
+      - job_name: "prometheus"
+
+        static_configs:
+          - targets:
+              - "localhost:9090"
+
+      # --------------------------------------------
+      # CloudPilot Core Backend
+      # --------------------------------------------
+      - job_name: "cloudpilot-core"
+
+        metrics_path: /actuator/prometheus
+
+        static_configs:
+          - targets:
+              - "core-backend:8081"
+
+            labels:
+              service: "core-backend"
+
+      # --------------------------------------------
+      # CloudPilot Audit Service
+      # --------------------------------------------
+      - job_name: "cloudpilot-audit"
+
+        metrics_path: /actuator/prometheus
+
+        static_configs:
+          - targets:
+              - "audit-service:8082"
+
+            labels:
+              service: "audit-service"
+
+      # --------------------------------------------
+      # Kafka Exporter
+      # --------------------------------------------
+      - job_name: "cloudpilot-kafka"
+
+        static_configs:
+          - targets:
+              - "kafka-exporter:9308"
+
+            labels:
+              service: "kafka-exporter"
+
+      # --------------------------------------------
+      # Kafka Broker TCP Availability
+      # --------------------------------------------
+      - job_name: "cloudpilot-kafka-broker"
+
+        metrics_path: /probe
+
+        params:
+          module:
+            - tcp_connect
+
+        static_configs:
+          - targets:
+              - "kafka:9092"
+
+        relabel_configs:
+          - source_labels:
+              - __address__
+            target_label: __param_target
+
+          - source_labels:
+              - __param_target
+            target_label: instance
+
+          - target_label: __address__
+            replacement: "blackbox-exporter:9115"
+
+---
+# ==================================================
+# Prometheus Service
+# ==================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: cloudpilot
+
+spec:
+  type: NodePort
+
+  selector:
+    app: prometheus
+
+  ports:
+    - name: http
+      port: 9090
+      targetPort: 9090
+      nodePort: 30090
+
+---
+# ==================================================
+# Prometheus Deployment
+# ==================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: cloudpilot
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: prometheus
+
+  template:
+    metadata:
+      labels:
+        app: prometheus
+
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v3.14.0
+          imagePullPolicy: IfNotPresent
+
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--storage.tsdb.retention.time=6h"
+            - "--web.enable-remote-write-receiver"
+            - "--enable-feature=exemplar-storage"
+
+          ports:
+            - name: http
+              containerPort: 9090
+
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus/prometheus.yml
+              subPath: prometheus.yml
+              readOnly: true
+
+          startupProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            periodSeconds: 3
+            failureThreshold: 20
+
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config

@@ -1,0 +1,1 @@
+CREATE DATABASE cloudpilot_audit_db;

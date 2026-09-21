@@ -1,0 +1,386 @@
+.subscription-page {
+  width: 100%;
+}
+
+.subscription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 26px;
+}
+
+.subscription-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.subscription-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.subscription-header > div > p:last-child {
+  margin-top: 7px;
+  color: #64748b;
+}
+
+.current-plan-badge,
+.plan-name-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.plan-card,
+.usage-card,
+.plan-summary {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: white;
+}
+
+.plan-card {
+  margin-bottom: 24px;
+  padding: 24px;
+}
+
+.plan-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.plan-card-top span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.plan-card-top h2 {
+  margin: 5px 0;
+  font-size: 26px;
+}
+
+.plan-card-top p {
+  margin: 0;
+  color: #64748b;
+}
+
+.upgrade-plan-button {
+  margin-top: 22px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #2563eb;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.usage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.usage-card {
+  padding: 22px;
+}
+
+.usage-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.usage-card-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.usage-card-header span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.usage-card-header strong {
+  font-size: 24px;
+}
+
+.usage-progress {
+  height: 9px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.usage-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+  transition: width 0.25s ease;
+}
+
+.usage-card p {
+  margin: 12px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.usage-card .usage-warning {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.plan-summary {
+  margin-top: 24px;
+  padding: 22px;
+}
+
+.plan-summary h2 {
+  margin: 0 0 15px;
+  font-size: 18px;
+}
+
+.plan-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.plan-summary-row:first-of-type {
+  border-top: 0;
+}
+
+.available-plans-section {
+  margin-top: 28px;
+}
+
+.available-plans-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.available-plans-header p {
+  margin: 5px 0 18px;
+  color: #64748b;
+}
+
+.available-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.available-plan-card {
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  background: white;
+}
+
+.available-plan-card.current {
+  border-width: 2px;
+  border-color: #2563eb;
+}
+
+.available-plan-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.plan-label {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.available-plan-card h3 {
+  margin: 5px 0 0;
+  font-size: 22px;
+}
+
+.current-plan-pill {
+  height: fit-content;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.plan-description {
+  min-height: 42px;
+  margin: 15px 0 18px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.available-plan-card .plan-limit-row,
+.plan-feature-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid #e2e8f0;
+  font-size: 14px;
+}
+
+.plan-change-button,
+.plan-current-button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-weight: 700;
+}
+
+.plan-change-button {
+  border: 0;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.plan-current-button {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.plan-success-message {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #ecfdf5;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.plan-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.plan-modal {
+  width: 100%;
+  max-width: 480px;
+  padding: 26px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.plan-modal h2 {
+  margin: 0;
+}
+
+.plan-modal > p {
+  margin: 10px 0 20px;
+  color: #64748b;
+}
+
+.plan-change-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.plan-change-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.plan-change-summary span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.plan-downgrade-warning {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.plan-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.plan-cancel-button,
+.plan-confirm-button {
+  width: auto;
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.plan-cancel-button {
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #334155;
+}
+
+.plan-confirm-button {
+  border: 0;
+  background: #2563eb;
+  color: white;
+}
+
+.plan-confirm-button:disabled,
+.plan-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.subscription-error {
+  padding: 14px;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+@media (max-width: 800px) {
+  .usage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .subscription-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .available-plans-grid {
+    grid-template-columns: 1fr;
+  }
+}

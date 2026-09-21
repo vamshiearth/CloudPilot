@@ -1,0 +1,94 @@
+.profile-page {
+  width: 100%;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.profile-eyebrow {
+  margin: 0 0 6px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.profile-header h1,
+.profile-card h2,
+.profile-hero h2 {
+  margin: 0;
+}
+
+.profile-header h1 { font-size: 30px; }
+.profile-header p:last-child { margin: 7px 0 0; color: #64748b; }
+
+.profile-status {
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-hero,
+.profile-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: white;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  margin-bottom: 18px;
+}
+
+.profile-avatar {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: #2563eb;
+  color: white;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.profile-hero h2 { font-size: 22px; }
+.profile-hero p { margin: 5px 0 8px; color: #64748b; }
+.profile-hero span { color: #2563eb; font-size: 13px; font-weight: 700; }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.profile-card { padding: 24px; }
+.profile-card h2 { font-size: 18px; }
+.profile-fields { margin-top: 20px; display: grid; gap: 17px; }
+.profile-fields div { display: flex; flex-direction: column; gap: 5px; }
+.profile-fields span,
+.permissions-card p { color: #64748b; font-size: 13px; }
+.profile-fields strong { color: #172033; font-size: 14px; }
+.permissions-card { display: flex; justify-content: space-between; gap: 24px; }
+.permissions-card p { margin: 7px 0 0; }
+.permission-list { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.permission-list span { padding: 8px 10px; border-radius: 8px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 700; }
+
+@media (max-width: 720px) {
+  .profile-header, .permissions-card { flex-direction: column; gap: 16px; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .permission-list { justify-content: flex-start; }
+}

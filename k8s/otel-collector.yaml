@@ -1,0 +1,153 @@
+# ==================================================
+# OpenTelemetry Collector Configuration
+# ==================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: cloudpilot
+
+data:
+  otel-collector.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+
+          http:
+            endpoint: 0.0.0.0:4318
+
+    processors:
+      batch: {}
+
+    exporters:
+      debug:
+        verbosity: normal
+
+      otlphttp/tempo:
+        endpoint: http://tempo:4318
+
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    service:
+      extensions:
+        - health_check
+
+      pipelines:
+        traces:
+          receivers:
+            - otlp
+
+          processors:
+            - batch
+
+          exporters:
+            - debug
+            - otlphttp/tempo
+
+---
+# ==================================================
+# OpenTelemetry Collector Service
+# ==================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: cloudpilot
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: otel-collector
+
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+
+    - name: health
+      port: 13133
+      targetPort: 13133
+
+---
+# ==================================================
+# OpenTelemetry Collector Deployment
+# ==================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: cloudpilot
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: otel-collector
+
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+
+    spec:
+      containers:
+        - name: otel-collector
+          image: otel/opentelemetry-collector-contrib:0.161.0
+          imagePullPolicy: IfNotPresent
+
+          args:
+            - "--config=/etc/otelcol-contrib/otel-collector.yaml"
+
+          ports:
+            - name: otlp-grpc
+              containerPort: 4317
+
+            - name: otlp-http
+              containerPort: 4318
+
+            - name: health
+              containerPort: 13133
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otelcol-contrib/otel-collector.yaml
+              subPath: otel-collector.yaml
+              readOnly: true
+
+          startupProbe:
+            httpGet:
+              path: /
+              port: 13133
+            periodSeconds: 3
+            failureThreshold: 20
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+      volumes:
+        - name: config
+          configMap:
+            name: otel-collector-config

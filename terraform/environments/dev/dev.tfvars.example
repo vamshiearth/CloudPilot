@@ -1,0 +1,42 @@
+project_name = "cloudpilot"
+environment  = "dev"
+aws_region   = "us-east-1"
+
+vpc_cidr = "10.0.0.0/16"
+
+availability_zones = [
+  "us-east-1a",
+  "us-east-1b"
+]
+
+public_subnet_cidrs = [
+  "10.0.0.0/20",
+  "10.0.16.0/20"
+]
+
+private_subnet_cidrs = [
+  "10.0.32.0/20",
+  "10.0.48.0/20"
+]
+
+enable_nat_gateway = false
+
+eks_node_instance_types = [
+  "t3.xlarge"
+]
+
+eks_node_desired_size = 1
+eks_node_min_size     = 1
+eks_node_max_size     = 1
+eks_node_disk_size    = 40
+
+ebs_storage_class_name    = "cloudpilot-gp3"
+postgres_storage_size_gib = 5
+kafka_storage_size_gib    = 5
+tempo_storage_size_gib    = 5
+
+alb_ingress_scheme = "internet-facing"
+alb_target_type    = "ip"
+
+postgres_database = "cloudpilot"
+audit_database    = "cloudpilot_audit_db"

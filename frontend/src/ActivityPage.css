@@ -1,0 +1,153 @@
+.activity-page {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.activity-kicker {
+  margin: 0 0 8px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.activity-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 32px;
+}
+
+.activity-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+}
+
+.activity-count {
+  color: #475569;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.activity-panel {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.activity-list {
+  display: grid;
+}
+
+.activity-item {
+  padding: 22px 26px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.activity-item:last-child {
+  border-bottom: 0;
+}
+
+.activity-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+}
+
+.activity-item h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+.activity-time {
+  flex: 0 0 auto;
+  color: #64748b;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.activity-description {
+  margin: 9px 0 14px;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.activity-resource {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.activity-state {
+  padding: 48px 24px;
+  color: #64748b;
+  text-align: center;
+}
+
+.activity-error {
+  padding: 22px 26px;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.activity-retry {
+  width: auto;
+  margin-top: 16px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.activity-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.activity-pagination button {
+  width: auto;
+  min-width: 100px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.activity-page-label {
+  color: #475569;
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .activity-header,
+  .activity-item-top {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .activity-item {
+    padding: 18px;
+  }
+
+  .activity-pagination {
+    flex-wrap: wrap;
+  }
+}

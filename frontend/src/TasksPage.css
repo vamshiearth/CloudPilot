@@ -1,0 +1,155 @@
+.tasks-page {
+  width: 100%;
+}
+
+.tasks-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.tasks-page-header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.tasks-page-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+}
+
+.tasks-filter {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #334155;
+  font-weight: 600;
+}
+
+.tasks-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.tasks-summary-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.tasks-summary-card span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.tasks-summary-card strong {
+  display: block;
+  font-size: 28px;
+  margin-top: 8px;
+}
+
+.all-tasks-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.all-task-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  padding: 20px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.all-task-row:first-child {
+  border-top: none;
+}
+
+.all-task-main h3 {
+  margin: 0 0 6px;
+}
+
+.all-task-main p {
+  margin: 0 0 8px;
+  color: #64748b;
+}
+
+.all-task-main span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.all-task-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.global-priority {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.global-priority-high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.global-priority-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.global-priority-low {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.global-status-select {
+  padding: 7px 10px;
+  border-radius: 20px;
+  border: 1px solid #bfdbfe;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.tasks-page-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.tasks-page-empty {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .tasks-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .tasks-page-header,
+  .all-task-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

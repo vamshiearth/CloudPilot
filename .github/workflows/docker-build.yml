@@ -1,0 +1,104 @@
+name: CloudPilot Docker Builds
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudpilot-docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect Docker Changes
+    runs-on: ubuntu-latest
+
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      audit: ${{ steps.filter.outputs.audit }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+
+            audit:
+              - 'audit-service/**'
+
+            frontend:
+              - 'frontend/**'
+
+  core-image:
+    name: Core Backend Image
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Core image
+        run: |
+          docker build \
+            -t cloudpilot-core-backend:ci \
+            ./backend
+
+      - name: Verify Core image exists
+        run: docker image inspect cloudpilot-core-backend:ci
+
+  audit-image:
+    name: Audit Service Image
+    needs: changes
+    if: needs.changes.outputs.audit == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Audit image
+        run: |
+          docker build \
+            -t cloudpilot-audit-service:ci \
+            ./audit-service
+
+      - name: Verify Audit image exists
+        run: docker image inspect cloudpilot-audit-service:ci
+
+  frontend-image:
+    name: Frontend Image
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Frontend image
+        run: |
+          docker build \
+            -t cloudpilot-frontend:ci \
+            ./frontend
+
+      - name: Verify Frontend image exists
+        run: docker image inspect cloudpilot-frontend:ci

@@ -1,0 +1,101 @@
+# ==================================================
+# Blackbox Exporter Configuration
+# ==================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blackbox-exporter-config
+  namespace: cloudpilot
+
+data:
+  blackbox.yml: |
+    modules:
+      tcp_connect:
+        prober: tcp
+        timeout: 5s
+
+---
+# ==================================================
+# Blackbox Exporter Service
+# ==================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: blackbox-exporter
+  namespace: cloudpilot
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: blackbox-exporter
+
+  ports:
+    - name: http
+      port: 9115
+      targetPort: 9115
+
+---
+# ==================================================
+# Blackbox Exporter Deployment
+# ==================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blackbox-exporter
+  namespace: cloudpilot
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: blackbox-exporter
+
+  template:
+    metadata:
+      labels:
+        app: blackbox-exporter
+
+    spec:
+      containers:
+        - name: blackbox-exporter
+          image: quay.io/prometheus/blackbox-exporter:v0.28.0
+          imagePullPolicy: IfNotPresent
+
+          args:
+            - "--config.file=/etc/blackbox_exporter/blackbox.yml"
+
+          ports:
+            - name: http
+              containerPort: 9115
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/blackbox_exporter/blackbox.yml
+              subPath: blackbox.yml
+              readOnly: true
+
+          startupProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9115
+            periodSeconds: 3
+            failureThreshold: 20
+
+          readinessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9115
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9115
+            periodSeconds: 20
+
+      volumes:
+        - name: config
+          configMap:
+            name: blackbox-exporter-config
