@@ -1,4 +1,4 @@
-apiVersion: v1
+﻿apiVersion: v1
 data:
   cloudpilot-overview.json: "{\r\n    \"id\":  null,\r\n    \"panels\":  [\r\n                   {\r\n
     \                      \"datasource\":  {\r\n                                          \"type\":
@@ -754,8 +754,150 @@ data:
     \                                          \"refId\":  \"A\"\r\n                                       }\r\n
     \                                  ],\r\n                       \"title\":  \"Noisy
     Neighbor Detection Sample\",\r\n                       \"type\":  \"stat\"\r\n
-    \                  }\r\n               ],\r\n    \"refresh\":  \"15s\",\r\n    \"schemaVersion\":
-    \ 41,\r\n    \"tags\":  [\r\n                 \"cloudpilot\",\r\n                 \"observability\"\r\n
+    \                  },\r\n                   {\r\n                       \"datasource\":
+    \ {\r\n                                          \"type\":  \"prometheus\",\r\n
+    \                                         \"uid\":  \"prometheus\"\r\n                                      },\r\n
+    \                      \"fieldConfig\":  {\r\n                                           \"defaults\":
+    \ {\r\n                                                            \"decimals\":
+    \ 0,\r\n                                                            \"min\":  0,\r\n
+    \                                                           \"unit\":  \"none\"\r\n
+    \                                                       },\r\n                                           \"overrides\":
+    \ [\r\n\r\n                                                         ]\r\n                                       },\r\n
+    \                      \"gridPos\":  {\r\n                                       \"h\":
+    \ 8,\r\n                                       \"w\":  8,\r\n                                       \"x\":
+    \ 0,\r\n                                       \"y\":  176\r\n                                   },\r\n
+    \                      \"id\":  26,\r\n                       \"options\":  {\r\n
+    \                                      \"colorMode\":  \"value\",\r\n                                       \"reduceOptions\":
+    \ {\r\n                                                             \"calcs\":
+    \ [\r\n                                                                           \"lastNotNull\"\r\n
+    \                                                                      ],\r\n
+    \                                                            \"fields\":  \"\",\r\n
+    \                                                            \"values\":  false\r\n
+    \                                                        },\r\n                                       \"textMode\":
+    \ \"auto\"\r\n                                   },\r\n                       \"targets\":
+    \ [\r\n                                       {\r\n                                           \"datasource\":
+    \ {\r\n                                                              \"type\":
+    \ \"prometheus\",\r\n                                                              \"uid\":
+    \ \"prometheus\"\r\n                                                          },\r\n
+    \                                          \"expr\":  \"cloudpilot_cost_tenants_with_budget\",\r\n
+    \                                          \"refId\":  \"A\"\r\n                                       }\r\n
+    \                                  ],\r\n                       \"title\":  \"Tenants
+    With Budgets\",\r\n                       \"type\":  \"stat\"\r\n                   },\r\n
+    \                  {\r\n                       \"datasource\":  {\r\n                                          \"type\":
+    \ \"prometheus\",\r\n                                          \"uid\":  \"prometheus\"\r\n
+    \                                     },\r\n                       \"fieldConfig\":
+    \ {\r\n                                           \"defaults\":  {\r\n                                                            \"decimals\":
+    \ 0,\r\n                                                            \"min\":  0,\r\n
+    \                                                           \"unit\":  \"none\"\r\n
+    \                                                       },\r\n                                           \"overrides\":
+    \ [\r\n\r\n                                                         ]\r\n                                       },\r\n
+    \                      \"gridPos\":  {\r\n                                       \"h\":
+    \ 8,\r\n                                       \"w\":  8,\r\n                                       \"x\":
+    \ 8,\r\n                                       \"y\":  176\r\n                                   },\r\n
+    \                      \"id\":  27,\r\n                       \"options\":  {\r\n
+    \                                      \"colorMode\":  \"value\",\r\n                                       \"reduceOptions\":
+    \ {\r\n                                                             \"calcs\":
+    \ [\r\n                                                                           \"lastNotNull\"\r\n
+    \                                                                      ],\r\n
+    \                                                            \"fields\":  \"\",\r\n
+    \                                                            \"values\":  false\r\n
+    \                                                        },\r\n                                       \"textMode\":
+    \ \"auto\"\r\n                                   },\r\n                       \"targets\":
+    \ [\r\n                                       {\r\n                                           \"datasource\":
+    \ {\r\n                                                              \"type\":
+    \ \"prometheus\",\r\n                                                              \"uid\":
+    \ \"prometheus\"\r\n                                                          },\r\n
+    \                                          \"expr\":  \"cloudpilot_cost_over_budget_tenants\",\r\n
+    \                                          \"refId\":  \"A\"\r\n                                       }\r\n
+    \                                  ],\r\n                       \"title\":  \"Over-Budget
+    Tenants\",\r\n                       \"type\":  \"stat\"\r\n                   },\r\n
+    \                  {\r\n                       \"datasource\":  {\r\n                                          \"type\":
+    \ \"prometheus\",\r\n                                          \"uid\":  \"prometheus\"\r\n
+    \                                     },\r\n                       \"fieldConfig\":
+    \ {\r\n                                           \"defaults\":  {\r\n                                                            \"decimals\":
+    \ 0,\r\n                                                            \"min\":  0,\r\n
+    \                                                           \"unit\":  \"none\"\r\n
+    \                                                       },\r\n                                           \"overrides\":
+    \ [\r\n\r\n                                                         ]\r\n                                       },\r\n
+    \                      \"gridPos\":  {\r\n                                       \"h\":
+    \ 8,\r\n                                       \"w\":  8,\r\n                                       \"x\":
+    \ 16,\r\n                                       \"y\":  176\r\n                                   },\r\n
+    \                      \"id\":  28,\r\n                       \"options\":  {\r\n
+    \                                      \"colorMode\":  \"value\",\r\n                                       \"reduceOptions\":
+    \ {\r\n                                                             \"calcs\":
+    \ [\r\n                                                                           \"lastNotNull\"\r\n
+    \                                                                      ],\r\n
+    \                                                            \"fields\":  \"\",\r\n
+    \                                                            \"values\":  false\r\n
+    \                                                        },\r\n                                       \"textMode\":
+    \ \"auto\"\r\n                                   },\r\n                       \"targets\":
+    \ [\r\n                                       {\r\n                                           \"datasource\":
+    \ {\r\n                                                              \"type\":
+    \ \"prometheus\",\r\n                                                              \"uid\":
+    \ \"prometheus\"\r\n                                                          },\r\n
+    \                                          \"expr\":  \"cloudpilot_cost_anomaly_candidates\",\r\n
+    \                                          \"refId\":  \"A\"\r\n                                       }\r\n
+    \                                  ],\r\n                       \"title\":  \"Cost
+    Anomaly Candidates\",\r\n                       \"type\":  \"stat\"\r\n                   },\r\n
+    \                  {\r\n                       \"datasource\":  {\r\n                                          \"type\":
+    \ \"prometheus\",\r\n                                          \"uid\":  \"prometheus\"\r\n
+    \                                     },\r\n                       \"fieldConfig\":
+    \ {\r\n                                           \"defaults\":  {\r\n                                                            \"decimals\":
+    \ 2,\r\n                                                            \"min\":  0,\r\n
+    \                                                           \"unit\":  \"none\"\r\n
+    \                                                       },\r\n                                           \"overrides\":
+    \ [\r\n\r\n                                                         ]\r\n                                       },\r\n
+    \                      \"gridPos\":  {\r\n                                       \"h\":
+    \ 8,\r\n                                       \"w\":  12,\r\n                                       \"x\":
+    \ 0,\r\n                                       \"y\":  184\r\n                                   },\r\n
+    \                      \"id\":  29,\r\n                       \"options\":  {\r\n
+    \                                      \"reduceOptions\":  {\r\n                                                             \"calcs\":
+    \ [\r\n                                                                           \"lastNotNull\"\r\n
+    \                                                                      ],\r\n
+    \                                                            \"fields\":  \"\",\r\n
+    \                                                            \"values\":  false\r\n
+    \                                                        },\r\n                                       \"showThresholdLabels\":
+    \ false,\r\n                                       \"showThresholdMarkers\":  true\r\n
+    \                                  },\r\n                       \"targets\":  [\r\n
+    \                                      {\r\n                                           \"datasource\":
+    \ {\r\n                                                              \"type\":
+    \ \"prometheus\",\r\n                                                              \"uid\":
+    \ \"prometheus\"\r\n                                                          },\r\n
+    \                                          \"expr\":  \"cloudpilot_cost_max_pressure\",\r\n
+    \                                          \"refId\":  \"A\"\r\n                                       }\r\n
+    \                                  ],\r\n                       \"title\":  \"Max
+    Cost Pressure\",\r\n                       \"type\":  \"stat\"\r\n                   },\r\n
+    \                  {\r\n                       \"datasource\":  {\r\n                                          \"type\":
+    \ \"prometheus\",\r\n                                          \"uid\":  \"prometheus\"\r\n
+    \                                     },\r\n                       \"fieldConfig\":
+    \ {\r\n                                           \"defaults\":  {\r\n                                                            \"decimals\":
+    \ 1,\r\n                                                            \"max\":  100,\r\n
+    \                                                           \"min\":  0,\r\n                                                            \"unit\":
+    \ \"percent\"\r\n                                                        },\r\n
+    \                                          \"overrides\":  [\r\n\r\n                                                         ]\r\n
+    \                                      },\r\n                       \"gridPos\":
+    \ {\r\n                                       \"h\":  8,\r\n                                       \"w\":
+    \ 12,\r\n                                       \"x\":  12,\r\n                                       \"y\":
+    \ 184\r\n                                   },\r\n                       \"id\":
+    \ 30,\r\n                       \"options\":  {\r\n                                       \"reduceOptions\":
+    \ {\r\n                                                             \"calcs\":
+    \ [\r\n                                                                           \"lastNotNull\"\r\n
+    \                                                                      ],\r\n
+    \                                                            \"fields\":  \"\",\r\n
+    \                                                            \"values\":  false\r\n
+    \                                                        },\r\n                                       \"showThresholdLabels\":
+    \ false,\r\n                                       \"showThresholdMarkers\":  true\r\n
+    \                                  },\r\n                       \"targets\":  [\r\n
+    \                                      {\r\n                                           \"datasource\":
+    \ {\r\n                                                              \"type\":
+    \ \"prometheus\",\r\n                                                              \"uid\":
+    \ \"prometheus\"\r\n                                                          },\r\n
+    \                                          \"expr\":  \"cloudpilot_cost_max_budget_usage_percent\",\r\n
+    \                                          \"refId\":  \"A\"\r\n                                       }\r\n
+    \                                  ],\r\n                       \"title\":  \"Max
+    Budget Usage\",\r\n                       \"type\":  \"gauge\"\r\n                   }\r\n
+    \              ],\r\n    \"refresh\":  \"15s\",\r\n    \"schemaVersion\":  41,\r\n
+    \   \"tags\":  [\r\n                 \"cloudpilot\",\r\n                 \"observability\"\r\n
     \            ],\r\n    \"time\":  {\r\n                 \"from\":  \"now-1h\",\r\n
     \                \"to\":  \"now\"\r\n             },\r\n    \"timezone\":  \"browser\",\r\n
     \   \"title\":  \"CloudPilot Overview\",\r\n    \"uid\":  \"cloudpilot-overview\",\r\n

@@ -3,6 +3,7 @@ import {
   Activity,
   BarChart3,
   CreditCard,
+  ChartNoAxesCombined,
   FolderKanban,
   LayoutDashboard,
   ListTodo,
@@ -21,6 +22,7 @@ import SubscriptionPage from './SubscriptionPage'
 import ActivityPage from './ActivityPage'
 import ProfilePage from './ProfilePage'
 import SettingsPage from './SettingsPage'
+import CostIntelligencePage from './CostIntelligencePage'
 import './Dashboard.css'
 
 type User = {
@@ -83,6 +85,7 @@ function Dashboard({ user, token, onLogout }: DashboardProps) {
     | 'activity'
     | 'profile'
     | 'settings'
+    | 'costs'
   >('dashboard')
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
     null,
@@ -270,6 +273,16 @@ function Dashboard({ user, token, onLogout }: DashboardProps) {
               <span className="nav-label">Subscription</span>
             </button>
           )}
+          {hasPermission('BILLING_READ') && (
+            <button
+              className={activePage === 'costs' ? 'nav-item active' : 'nav-item'}
+              title="Cost Intelligence"
+              onClick={() => setActivePage('costs')}
+            >
+              <ChartNoAxesCombined className="nav-icon" size={18} aria-hidden="true" />
+              <span className="nav-label">Cost Intelligence</span>
+            </button>
+          )}
           {canViewUsers && (
             <button
               className={activePage === 'activity' ? 'nav-item active' : 'nav-item'}
@@ -383,6 +396,8 @@ function Dashboard({ user, token, onLogout }: DashboardProps) {
             theme={theme}
             onThemeChange={changeTheme}
           />
+        ) : activePage === 'costs' ? (
+          <CostIntelligencePage token={token} role={authContext?.role || null} />
         ) : (
           <>
             <header className="dashboard-header">
