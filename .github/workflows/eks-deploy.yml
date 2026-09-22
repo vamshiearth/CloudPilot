@@ -1,0 +1,70 @@
+name: CloudPilot EKS Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Container image tag to deploy"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloudpilot-eks-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy CloudPilot
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ vars.EKS_CLUSTER_NAME }}" \
+            --region "${{ vars.AWS_REGION }}"
+
+      - name: Update Core image
+        run: |
+          kubectl -n cloudpilot set image deployment/core-backend \
+            core-backend=${{ vars.ECR_CORE_REPOSITORY }}:${{ inputs.image_tag }}
+
+      - name: Update Audit image
+        run: |
+          kubectl -n cloudpilot set image deployment/audit-service \
+            audit-service=${{ vars.ECR_AUDIT_REPOSITORY }}:${{ inputs.image_tag }}
+
+      - name: Update Frontend image
+        run: |
+          kubectl -n cloudpilot set image deployment/frontend \
+            frontend=${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ inputs.image_tag }}
+
+      - name: Wait for Core rollout
+        run: |
+          kubectl -n cloudpilot rollout status deployment/core-backend \
+            --timeout=5m
+
+      - name: Wait for Audit rollout
+        run: |
+          kubectl -n cloudpilot rollout status deployment/audit-service \
+            --timeout=5m
+
+      - name: Wait for Frontend rollout
+        run: |
+          kubectl -n cloudpilot rollout status deployment/frontend \
+            --timeout=5m

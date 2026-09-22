@@ -19,6 +19,11 @@ output "github_actions_role_arn" {
   value       = aws_iam_role.github_actions.arn
 }
 
+output "github_actions_deploy_role_arn" {
+  description = "IAM role ARN used by GitHub Actions for EKS deployment"
+  value       = aws_iam_role.github_actions_deploy.arn
+}
+
 output "vpc_id" {
   description = "CloudPilot VPC ID"
   value       = aws_vpc.cloudpilot.id
