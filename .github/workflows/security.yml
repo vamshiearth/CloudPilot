@@ -67,9 +67,14 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
-          ./mvnw org.owasp:dependency-check-maven:check \
-            -DfailBuildOnCVSS=8 \
-            -DnvdApiKey="${NVD_API_KEY}"
+          if [ -n "${NVD_API_KEY}" ]; then
+            ./mvnw org.owasp:dependency-check-maven:check \
+              -DfailBuildOnCVSS=8 \
+              -DnvdApiKey="${NVD_API_KEY}"
+          else
+            ./mvnw org.owasp:dependency-check-maven:check \
+              -DfailBuildOnCVSS=8
+          fi
 
   audit-dependency-scan:
     name: Audit Dependency Scan
@@ -94,9 +99,14 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
-          ./mvnw org.owasp:dependency-check-maven:check \
-            -DfailBuildOnCVSS=8 \
-            -DnvdApiKey="${NVD_API_KEY}"
+          if [ -n "${NVD_API_KEY}" ]; then
+            ./mvnw org.owasp:dependency-check-maven:check \
+              -DfailBuildOnCVSS=8 \
+              -DnvdApiKey="${NVD_API_KEY}"
+          else
+            ./mvnw org.owasp:dependency-check-maven:check \
+              -DfailBuildOnCVSS=8
+          fi
 
   secret-scan:
     name: Secret Scan
