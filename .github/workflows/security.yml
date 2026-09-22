@@ -66,6 +66,14 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Cache OWASP Dependency-Check data
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check
+          key: dependency-check-${{ runner.os }}-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: |
+            dependency-check-${{ runner.os }}-
+
       - name: OWASP Dependency Check
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
@@ -76,7 +84,8 @@ jobs:
           fi
           ./mvnw org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=8 \
-            -DnvdApiKey="${NVD_API_KEY}"
+            -DnvdApiKey="${NVD_API_KEY}" \
+            -DdataDirectory="$HOME/.dependency-check"
 
   audit-dependency-scan:
     name: Audit Dependency Scan
@@ -100,6 +109,14 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Cache OWASP Dependency-Check data
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check
+          key: dependency-check-${{ runner.os }}-${{ hashFiles('audit-service/pom.xml') }}
+          restore-keys: |
+            dependency-check-${{ runner.os }}-
+
       - name: OWASP Dependency Check
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
@@ -110,7 +127,8 @@ jobs:
           fi
           ./mvnw org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=8 \
-            -DnvdApiKey="${NVD_API_KEY}"
+            -DnvdApiKey="${NVD_API_KEY}" \
+            -DdataDirectory="$HOME/.dependency-check"
 
   secret-scan:
     name: Secret Scan
