@@ -1,10 +1,25 @@
 # CloudPilot
 
-CloudPilot is a multi-tenant SaaS platform built with Spring Boot, React,
-PostgreSQL, Redis, Kafka, and an independent audit service. It provides
-tenant-scoped access control, project and task management, subscriptions,
-audit events, monitoring, tracing, and observation-only noisy-neighbor
-detection.
+CloudPilot is a multi-tenant SaaS operations platform for teams that need to plan work, manage access, understand usage, and operate services with better visibility. It combines project delivery, team administration, subscriptions, cost intelligence, audit history, and observability in one application.
+
+## What CloudPilot provides
+
+- **Work management:** Create projects, assign tasks, track status, and keep delivery visible.
+- **Team operations:** Invite members and manage OWNER, ADMIN, and MEMBER permissions.
+- **Subscriptions:** Track plans, usage, limits, feature access, and invitations.
+- **Cost Intelligence:** Review budgets, projections, service breakdowns, anomaly signals, and advisory optimization insights.
+- **Activity and audit:** Follow product activity in Core and persist audit events through the independent Audit Service.
+- **Observability:** Inspect Prometheus metrics, Grafana dashboards, and OpenTelemetry traces through Tempo.
+- **Noisy-neighbor signals:** Identify disproportionate tenant workload without throttling or changing tenant traffic.
+- **Multi-tenant security:** Derive tenant context from the authenticated server-side principal and enforce permissions at the API boundary.
+- **Deployment options:** Run locally with Docker Compose or use the included Kubernetes and Terraform foundations for a planned AWS deployment.
+
+## How the application is used
+
+1. An **OWNER** creates an organization, chooses a subscription, manages members, sets access rules, and reviews cost and platform health.
+2. An **ADMIN** invites people, assigns roles, organizes projects, and keeps the operating flow ready for the team.
+3. A **MEMBER** works on assigned projects and tasks, updates progress, and collaborates with the right context.
+4. CloudPilot turns activity, workload, cost, and service-health data into signals that help the organization act before issues become surprises.
 
 ## Architecture
 
@@ -14,76 +29,65 @@ React / Nginx -> Core Backend -> PostgreSQL
                          |      -> Kafka -> Audit Service -> Audit PostgreSQL
                          |
                          -> Micrometer -> Prometheus -> Grafana
-                         -> OpenTelemetry Java Agent -> OTel Collector -> Tempo
+                         -> OpenTelemetry Agent -> OTel Collector -> Tempo
 ```
 
-The frontend sends `/api` requests to the Core Backend. Core owns business
-operations and publishes audit events to Kafka. The Audit Service consumes
-those events and stores them separately. Observability is separate from the
-business path, so monitoring outages do not stop normal application work.
+The frontend sends `/api` requests to the Core Backend. Core owns business operations and publishes audit events to Kafka. The independent Audit Service consumes those events and stores them separately. Monitoring and tracing are kept outside the main business path so an observability outage does not stop normal work.
 
-## Requirements
+## Technology
 
-Docker Compose:
+| Area | Technology |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Nginx |
+| Core API | Spring Boot, Java 21 |
+| Data | PostgreSQL 16 |
+| Cache | Redis 7 |
+| Events | Apache Kafka 4 |
+| Audit | Independent Spring Boot service and audit database |
+| Metrics | Micrometer, Prometheus, Grafana |
+| Tracing | OpenTelemetry Collector and Grafana Tempo |
+| Infrastructure | Docker Compose, Kubernetes, Terraform, AWS foundations |
 
-- Docker Desktop
-- Docker Compose
+## Run locally with Docker Compose
 
-Kubernetes:
+### Prerequisites
 
-- Docker Desktop with Kubernetes enabled
-- `kubectl`
-- Local images for the Core Backend, Audit Service, and frontend
+- Docker Desktop with Docker Compose
 
-## Configuration
-
-Create a local `.env` file from `.env.example`:
+Create a local `.env` file in the repository root:
 
 ```env
 POSTGRES_PASSWORD=change-me
 JWT_SECRET=change-me
 ```
 
-Never commit `.env`; it is ignored by the root `.gitignore`.
+Use strong local values for both variables. Never commit `.env`.
 
-## Run with Docker Compose
-
-Start all services from the repository root:
+Start the full environment:
 
 ```bash
 docker compose up -d --build
 ```
 
-Check status and logs:
+Open the application at [http://localhost:3000](http://localhost:3000/).
+
+Useful commands:
 
 ```bash
 docker compose ps
 docker compose logs -f
-```
-
-Service-specific logs are available with commands such as:
-
-```bash
 docker compose logs -f core-backend
 docker compose logs -f audit-service
-docker compose logs -f kafka
-```
-
-Open the application at [http://localhost:3000](http://localhost:3000/).
-
-Stop the environment while preserving persistent data:
-
-```bash
 docker compose down
 ```
 
-Reset the environment and delete PostgreSQL and Kafka data:
+To remove persistent PostgreSQL and Kafka volumes as well:
 
 ```bash
 docker compose down -v
 ```
 
-### Docker Compose ports
+### Compose ports
 
 | Service | Port |
 | --- | ---: |
@@ -94,49 +98,38 @@ docker compose down -v
 | Redis | 6379 |
 | Kafka | 9092 |
 
-PostgreSQL and Kafka use named Docker volumes. Redis is an ephemeral cache.
-The frontend is served by Nginx and proxies `/api` requests to Core over the
-Compose network.
+PostgreSQL and Kafka use named Docker volumes. Redis is an ephemeral cache. The frontend is served by Nginx and proxies `/api` requests over the Compose network.
 
-## Run on Kubernetes
+## Kubernetes deployment
 
-Verify the Docker Desktop context:
+The `k8s/` directory contains a Docker Desktop Kubernetes deployment with PostgreSQL, Redis, Kafka, Core, Audit, Frontend, Prometheus, Grafana, Tempo, the OpenTelemetry Collector, Kafka Exporter, and Blackbox Exporter.
+
+Prerequisites:
+
+- Docker Desktop with Kubernetes enabled
+- `kubectl`
+- Local images for the Core Backend, Audit Service, and frontend
+
+Apply the base resources:
 
 ```bash
 kubectl config current-context
-```
-
-The expected context is `docker-desktop`.
-
-Create the namespace, configuration, and secrets:
-
-```bash
 kubectl apply -f k8s/namespace.yaml
 kubectl config set-context --current --namespace=cloudpilot
 kubectl apply -f k8s/configmap.yaml
 kubectl create secret generic cloudpilot-secrets --from-env-file=.env
 ```
 
-Create infrastructure:
+Start infrastructure and initialize Kafka:
 
 ```bash
 kubectl apply -f k8s/postgres.yaml
 kubectl apply -f k8s/redis.yaml
 kubectl apply -f k8s/kafka.yaml
 kubectl get pods
-kubectl get pvc
-```
-
-Initialize Kafka after the broker is ready:
-
-```bash
 kubectl apply -f k8s/kafka-topic-job.yaml
 kubectl get jobs
-kubectl logs job/kafka-topic-init
 ```
-
-The `cloudpilot.events` topic uses three partitions and replication factor one
-for local development.
 
 Deploy the application:
 
@@ -146,164 +139,77 @@ kubectl apply -f k8s/core-backend.yaml
 kubectl apply -f k8s/frontend.yaml
 ```
 
-Open the Kubernetes frontend at
-[http://localhost:30000](http://localhost:30000/).
+Open the Kubernetes frontend at [http://localhost:30000](http://localhost:30000/).
 
-Useful status and log commands:
+## Observability
 
-```bash
-kubectl get all
-kubectl get pvc
-kubectl logs deployment/core-backend
-kubectl logs deployment/audit-service
-kubectl logs deployment/frontend
-kubectl logs kafka-0
-kubectl logs postgres-0
-```
+The Kubernetes configuration exposes these local endpoints:
 
-PostgreSQL, Kafka, and Tempo use persistent storage. Redis, Core, Audit, and
-Frontend are disposable workloads. Application deployments recover deleted
-pods, and the frontend preserves JWTs during temporary 502, 503, and network
-failures.
-
-## Monitoring and observability
-
-The Kubernetes environment includes Prometheus, Grafana, Tempo, the
-OpenTelemetry Collector, Kafka Exporter, and Blackbox Exporter.
-
-| Component | Exposure | Local access |
-| --- | --- | --- |
-| Frontend | NodePort | `http://localhost:30000` |
-| Prometheus | NodePort | `http://localhost:30090` |
-| Grafana | NodePort | `http://localhost:30091` |
-| Core Backend | ClusterIP | 8081 |
-| Audit Service | ClusterIP | 8082 |
-| OTel Collector | ClusterIP | 4317 gRPC, 4318 HTTP |
-| Tempo | ClusterIP | 3200 HTTP |
-| Kafka Exporter | ClusterIP | 9308 metrics |
-| Blackbox Exporter | ClusterIP | 9115 probe endpoint |
-
-Only the frontend, Prometheus, and Grafana are exposed through NodePorts.
-Kafka is a protocol endpoint rather than a browser dashboard; use Grafana and
-Prometheus for Kafka visibility.
-
-Core and Audit expose `/actuator/health`, `/actuator/metrics`, and
-`/actuator/prometheus`. Metrics include HTTP requests, JVM and process data,
-HikariCP, Kafka consumers, and Redis fallback activity:
-
-```text
-cloudpilot_redis_fallback_total{cache="subscription-usage"}
-```
-
-Grafana is provisioned with Prometheus and Tempo data sources and the
-**CloudPilot Overview** dashboard. It includes request rate and errors,
-latency, JVM and CPU, database pools, audit processing, consumer lag, Kafka
-health and throughput, Redis fallback rate, and tenant workload indicators.
-
-Provisioning files:
-
-```text
-k8s/grafana.yaml
-k8s/grafana-dashboard-configmap.yaml
-k8s/grafana-dashboard-provider.yaml
-k8s/grafana-cloudpilot-overview.json
-```
-
-The OpenTelemetry Java Agent is version `2.31.1`. Core and Audit export OTLP
-HTTP traces to:
-
-```text
-http://otel-collector:4318/v1/traces
-```
-
-Tempo stores traces on the `tempo-data` persistent volume. Its metrics
-generator produces service-graph and span metrics and remote-writes them to
-Prometheus. Grafana connects traces and metrics through Tempo and Prometheus
-configuration.
-
-### Observability persistence and limitations
-
-| Component | Persistence |
+| Component | URL |
 | --- | --- |
-| PostgreSQL | PersistentVolumeClaim, 5Gi |
-| Kafka | PersistentVolumeClaim, 5Gi |
-| Tempo | PersistentVolumeClaim, 5Gi |
-| Redis | Ephemeral cache |
-| Prometheus | Ephemeral metrics storage |
-| Grafana | Provisioned configuration, no PVC |
-| Collector and exporters | Stateless |
+| Frontend | `http://localhost:30000` |
+| Prometheus | `http://localhost:30090` |
+| Grafana | `http://localhost:30091` |
 
-Prometheus history is lost after pod replacement. Collector outage recovery
-does not guarantee delivery of traces generated while it is down. Trace
-sampling is configured as `always_on` for local validation and should be tuned
-before production use.
+The provisioned **CloudPilot Overview** Grafana dashboard includes request rates and errors, latency, JVM and CPU data, database pools, audit processing, Kafka health and consumer lag, Redis fallback activity, and aggregate tenant workload indicators. Prometheus metrics intentionally do not contain tenant IDs as labels.
 
-## Tenant workload detection
+Core and Audit expose:
 
-CloudPilot includes observation-only noisy-neighbor detection for identifying
-tenants that create disproportionate shared workload. It does not throttle,
-reject, downgrade, or terminate tenant traffic.
+```text
+/actuator/health
+/actuator/metrics
+/actuator/prometheus
+```
 
-Tenant identity comes from the authenticated server-side context. The frontend
-cannot override it, and tenant IDs are intentionally excluded from Prometheus
-labels. Core tracks request counts, status codes, duration, latency, requests
-per minute, error rate, and recent activity in pod-local memory.
+OpenTelemetry traces are sent to the Collector and stored in Tempo. The main provisioning files are `k8s/grafana-cloudpilot-overview.json`, `k8s/grafana-dashboard-configmap.yaml`, `k8s/grafana-dashboard-provider.yaml`, `k8s/otel-collector.yaml`, and `k8s/tempo.yaml`.
 
-Detection uses request pressure, latency pressure, and a combined score weighted
-70% toward request pressure and 30% toward latency. Default classifications are
-`NORMAL`, `ELEVATED`, and `NOISY_CANDIDATE`. Detection requires at least two
-active tenants and ten platform requests. Thresholds are development heuristics
-and should be tuned for production.
+For local Kubernetes use, PostgreSQL, Kafka, and Tempo have persistent storage. Redis, Prometheus, Grafana, the Collector, exporters, and application pods are disposable or configuration-reprovisioned workloads. Prometheus history is lost after pod replacement.
 
-Tenant OWNER users can inspect their own assessment:
+## Cost Intelligence
+
+Cost Intelligence is tenant-aware and available through authenticated APIs and the React dashboard. It currently supports:
+
+- Simulated daily cost data
+- Budget tracking and monthly projections
+- Cost by service
+- Anomaly detection
+- Advisory optimization insights
+- Aggregate Prometheus cost metrics
+- Grafana visualization
+
+An AWS Cost Explorer adapter boundary and mapper are included for future integration. AWS billing integration is **disabled** in the current build and does not create an AWS client or make AWS API calls.
+
+## Tenant isolation and workload signals
+
+Tenant identity is derived from the authenticated server-side context. Client-provided tenant IDs are not used to override it. OWNER and ADMIN capabilities are enforced by role and permission checks, while MEMBER access is limited to operational project and task actions.
+
+Noisy-neighbor detection is observation-only. It tracks request pressure, latency pressure, error rate, and recent activity to classify workload as `NORMAL`, `ELEVATED`, or `NOISY_CANDIDATE`. It does not throttle, reject, downgrade, or terminate tenant traffic.
+
+An OWNER can inspect the current tenant assessment with:
 
 ```text
 GET /api/tenant/workload/me/assessment
 ```
 
-The API derives tenant identity from the authenticated principal and does not
-accept a tenant ID path or query parameter.
+The detector state is pod-local and resets when Core restarts. A multi-replica production deployment would require shared or aggregated detector state.
 
-Repeatable two-tenant load generation is available at:
-
-```text
-scripts/noisy-neighbor-load.ps1
-```
-
-JWTs are supplied at runtime and are not stored in the script. Detector state
-is pod-local and ephemeral; restarting Core resets tracking while business data
-and existing JWTs remain valid. A multi-replica deployment would require shared
-or aggregated detector state.
-
-## Reliability and security notes
+## Reliability notes
 
 - Redis failures fall back to PostgreSQL for subscription usage.
-- Audit Service outages do not stop Core business operations; Kafka retains
-  events for later consumption when available.
-- Kafka publication and database writes have a dual-write gap. A transactional
-  outbox is a future reliability improvement.
-- Core and Audit readiness checks are currently closer to liveness checks than
-  dependency-aware readiness checks.
-- Secrets are supplied through `.env` or Kubernetes Secrets and are not stored
-  in committed manifests.
-- Monitoring services are configured for local development and are not
-  internet-facing by default.
+- Audit Service outages do not stop Core business operations; Kafka retains events for later consumption when available.
+- Kafka publication and database writes have a documented dual-write gap. A transactional outbox remains a future reliability improvement.
+- Current readiness checks are closer to liveness checks than full dependency-aware readiness checks.
+- Local monitoring is not internet-facing by default.
 
-## Development notes
+## Development
 
-```text
-backend/   Spring Boot services and tests
-frontend/  React application and Vite configuration
-k8s/       Kubernetes manifests and observability provisioning
-scripts/   Local validation and workload simulation scripts
-```
-
-Build the frontend locally:
+Build the frontend:
 
 ```bash
 cd frontend
 npm install
 npm run build
+npm run lint
 ```
 
 Build the Core Backend artifact:
@@ -313,106 +219,36 @@ cd backend
 ./mvnw clean package -Dmaven.test.skip=true
 ```
 
-The current Core test sources contain unrelated compilation issues, so the
-production Docker build skips test compilation. That command is not a passing
-test-suite result.
+On Windows, use `mvnw.cmd`. The production Docker build skips test compilation because the current Core test sources contain unrelated compilation issues; the command above is not a passing test-suite result.
 
-## Phase 13 - Terraform Infrastructure as Code
-
-CloudPilot includes Terraform definitions for a planned AWS deployment.
-
-### Current deployment mode
-
-Terraform configuration has been validated against AWS, but infrastructure has
-not been provisioned. `terraform apply` has not been run.
-
-### Planned AWS architecture
-
-Terraform defines:
-
-- VPC with two public and two private subnets
-- Internet Gateway and an optional NAT Gateway, disabled by default
-- Security groups
-- Three ECR repositories
-- Amazon EKS cluster and one managed node group
-- EBS CSI driver and an encrypted gp3 Kubernetes StorageClass
-- Secrets Manager secret containers
-- EKS Pod Identity roles and associations
-- AWS Load Balancer Controller architecture
-- AWS-specific Kubernetes ingress overlay
-
-### Cost-conscious showcase configuration
-
-Current dev defaults:
-
-- EKS node count: 1
-- Instance type: `t3.xlarge`
-- Node disk: 40 GiB
-- NAT Gateway: disabled
-- PostgreSQL storage: 5 GiB
-- Kafka storage: 5 GiB
-- Tempo storage: 5 GiB
-
-Managed MSK, RDS, and ElastiCache are intentionally not included in the
-current showcase plan.
-
-### Container registry
-
-Separate ECR repositories are defined for the Core Backend, Audit Service, and
-Frontend. Image scanning is enabled and lifecycle policies retain only the
-latest 10 images.
-
-### IAM
-
-Terraform defines separate roles for the EKS control plane, EKS worker nodes,
-Core workload, Audit workload, and Grafana workload. Application workloads use
-EKS Pod Identity rather than embedded AWS access keys. Secrets access is
-workload-specific and least-privilege.
-
-### Secrets
-
-Terraform creates Secrets Manager containers only. Secret values are not stored
-in Terraform source, Terraform plan files, Kubernetes YAML, Git, or Docker
-images.
-
-### Storage
-
-Kubernetes persistent workloads use an encrypted gp3 StorageClass backed by the
-AWS EBS CSI driver. Planned PVC sizes are PostgreSQL 5 GiB, Kafka 5 GiB, and
-Tempo 5 GiB.
-
-### Ingress
-
-The AWS deployment uses:
+The main project directories are:
 
 ```text
-Internet -> Application Load Balancer -> ALB Ingress -> Frontend ClusterIP
+backend/        Core Spring Boot service
+audit-service/  Independent audit consumer and API
+frontend/       React application
+docker/         PostgreSQL initialization
+k8s/            Kubernetes and observability manifests
+scripts/        Local workload and validation scripts
+terraform/      Planned AWS infrastructure
 ```
 
-The local Docker Desktop Kubernetes NodePort configuration remains unchanged.
+## Terraform AWS foundation
 
-### Validation
+The `terraform/` directory describes a planned AWS deployment. It has been validated as infrastructure code, but `terraform apply` has not been run and no AWS resources are created by this repository automatically.
 
-Verified:
+The plan includes:
 
-- `terraform fmt`
-- `terraform validate`
-- AWS provider initialization
-- Kubernetes provider initialization
-- AWS identity
-- Static Terraform plan
+- VPC networking with public and private subnets
+- EKS and a managed node group
+- ECR repositories for Core, Audit, and Frontend images
+- Encrypted EBS gp3 storage through the CSI driver
+- IAM roles and EKS Pod Identity
+- Secrets Manager containers without committed secret values
+- AWS Load Balancer Controller and ALB ingress foundations
 
-Latest plan summary:
+The showcase configuration keeps NAT Gateway, MSK, RDS, and ElastiCache out of the current plan. Review and customize the Terraform variables before any production deployment.
 
-- 54 resources to add
-- 0 to change
-- 0 to destroy
+## Status
 
-The plan contains EKS, ECR, Secrets Manager, networking, storage, and IAM.
-It does not contain NAT Gateway, MSK, RDS, or ElastiCache resources. No secret
-values were present in the plan.
-
-### Safety
-
-`terraform apply` has not been run. No AWS resources were created during
-Phase 13.
+CloudPilot is an active project prototype. Review the configuration, security controls, persistence choices, and observability retention before exposing it to production traffic.
