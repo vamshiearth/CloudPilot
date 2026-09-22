@@ -64,9 +64,12 @@ jobs:
           cache: maven
 
       - name: OWASP Dependency Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           ./mvnw org.owasp:dependency-check-maven:check \
-            -DfailBuildOnCVSS=8
+            -DfailBuildOnCVSS=8 \
+            -DnvdApiKey="${NVD_API_KEY}"
 
   audit-dependency-scan:
     name: Audit Dependency Scan
@@ -88,9 +91,12 @@ jobs:
           cache: maven
 
       - name: OWASP Dependency Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           ./mvnw org.owasp:dependency-check-maven:check \
-            -DfailBuildOnCVSS=8
+            -DfailBuildOnCVSS=8 \
+            -DnvdApiKey="${NVD_API_KEY}"
 
   secret-scan:
     name: Secret Scan
