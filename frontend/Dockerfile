@@ -6,7 +6,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.31.6-alpine3.24
 
 RUN apk add --no-cache curl
 
