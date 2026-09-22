@@ -4,6 +4,18 @@ variable "project_name" {
   default     = "cloudpilot"
 }
 
+variable "github_owner" {
+  description = "GitHub repository owner"
+  type        = string
+  default     = "vamshiearth"
+}
+
+variable "github_repository" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "CloudPilot"
+}
+
 variable "environment" {
   description = "Deployment environment"
   type        = string
