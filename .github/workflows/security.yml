@@ -46,6 +46,9 @@ jobs:
 
   core-dependency-scan:
     name: Core Dependency Scan
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
 
     defaults:
@@ -67,12 +70,19 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
+          if [ -z "$NVD_API_KEY" ]; then
+            echo "::error::NVD_API_KEY is not configured"
+            exit 1
+          fi
           ./mvnw org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=8 \
             -DnvdApiKey="${NVD_API_KEY}"
 
   audit-dependency-scan:
     name: Audit Dependency Scan
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
 
     defaults:
@@ -94,6 +104,10 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
+          if [ -z "$NVD_API_KEY" ]; then
+            echo "::error::NVD_API_KEY is not configured"
+            exit 1
+          fi
           ./mvnw org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=8 \
             -DnvdApiKey="${NVD_API_KEY}"
