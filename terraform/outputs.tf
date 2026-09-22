@@ -95,8 +95,8 @@ output "eks_node_group_name" {
 }
 
 output "ebs_storage_class_name" {
-  description = "Kubernetes StorageClass used for CloudPilot persistent volumes"
-  value       = kubernetes_storage_class_v1.cloudpilot_gp3.metadata[0].name
+  description = "Kubernetes StorageClass to apply after EKS bootstrap"
+  value       = var.ebs_storage_class_name
 }
 
 output "postgres_storage_size_gib" {
