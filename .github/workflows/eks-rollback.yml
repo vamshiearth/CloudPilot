@@ -1,0 +1,68 @@
+name: CloudPilot EKS Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment:
+        description: "Deployment to roll back"
+        required: true
+        type: choice
+        options:
+          - core-backend
+          - audit-service
+          - frontend
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloudpilot-eks-deploy
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Roll Back CloudPilot
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ vars.EKS_CLUSTER_NAME }}" \
+            --region "${{ vars.AWS_REGION }}"
+
+      - name: Verify rollback permission
+        run: |
+          kubectl auth can-i update deployments -n cloudpilot
+
+      - name: Show rollout history
+        run: |
+          kubectl -n cloudpilot rollout history \
+            deployment/${{ inputs.deployment }}
+
+      - name: Roll back deployment
+        run: |
+          kubectl -n cloudpilot rollout undo \
+            deployment/${{ inputs.deployment }}
+
+      - name: Wait for rollback
+        run: |
+          kubectl -n cloudpilot rollout status \
+            deployment/${{ inputs.deployment }} \
+            --timeout=5m
+
+      - name: Verify deployment
+        run: |
+          kubectl -n cloudpilot get deployment \
+            ${{ inputs.deployment }}
+
+          kubectl -n cloudpilot get pods

@@ -39,6 +39,51 @@ jobs:
             --name "${{ vars.EKS_CLUSTER_NAME }}" \
             --region "${{ vars.AWS_REGION }}"
 
+      - name: Verify cluster access
+        run: |
+          kubectl auth can-i get deployments -n cloudpilot
+          kubectl auth can-i update deployments -n cloudpilot
+
+      - name: Verify target deployments exist
+        run: |
+          kubectl -n cloudpilot get deployment core-backend
+          kubectl -n cloudpilot get deployment audit-service
+          kubectl -n cloudpilot get deployment frontend
+
+      - name: Validate image tag
+        shell: bash
+        run: |
+          TAG="${{ inputs.image_tag }}"
+
+          if [[ -z "$TAG" ]]; then
+            echo "image_tag cannot be empty"
+            exit 1
+          fi
+
+          if [[ "$TAG" == "latest" ]]; then
+            echo "Refusing to deploy mutable tag: latest"
+            exit 1
+          fi
+
+          echo "Deploying immutable image tag: $TAG"
+
+      - name: Record current images
+        run: |
+          echo "Current Core:"
+          kubectl -n cloudpilot get deployment core-backend \
+            -o jsonpath='{.spec.template.spec.containers[*].image}'
+          echo
+
+          echo "Current Audit:"
+          kubectl -n cloudpilot get deployment audit-service \
+            -o jsonpath='{.spec.template.spec.containers[*].image}'
+          echo
+
+          echo "Current Frontend:"
+          kubectl -n cloudpilot get deployment frontend \
+            -o jsonpath='{.spec.template.spec.containers[*].image}'
+          echo
+
       - name: Update Core image
         run: |
           kubectl -n cloudpilot set image deployment/core-backend \
@@ -68,3 +113,8 @@ jobs:
         run: |
           kubectl -n cloudpilot rollout status deployment/frontend \
             --timeout=5m
+
+      - name: Deployment summary
+        run: |
+          kubectl -n cloudpilot get deployments
+          kubectl -n cloudpilot get pods
