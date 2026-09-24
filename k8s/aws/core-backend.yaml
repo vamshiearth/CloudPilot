@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: core-backend
+  namespace: cloudpilot
+spec:
+  selector:
+    app: core-backend
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core-backend
+  namespace: cloudpilot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: core-backend
+  template:
+    metadata:
+      labels:
+        app: core-backend
+    spec:
+      serviceAccountName: cloudpilot-core
+      containers:
+        - name: core-backend
+          image: 296062568732.dkr.ecr.us-east-1.amazonaws.com/cloudpilot-dev-core-backend:69ab67a
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8081
+          env:
+            - name: SERVER_PORT
+              value: "8081"
+            # --------------------------------------
+            # OpenTelemetry
+            # --------------------------------------
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/otel/opentelemetry-javaagent.jar"
+            - name: OTEL_SERVICE_NAME
+              value: "cloudpilot-core"
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
+              value: "http/protobuf"
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+              value: "http://otel-collector:4318/v1/traces"
+            - name: OTEL_TRACES_SAMPLER
+              value: "always_on"
+            - name: OTEL_METRICS_EXPORTER
+              value: "none"
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: CORE_DATABASE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: POSTGRES_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudpilot-secrets
+                  key: POSTGRES_PASSWORD
+            - name: SPRING_DATA_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: REDIS_HOST
+            - name: SPRING_DATA_REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: REDIS_PORT
+            - name: REDIS_CONNECT_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: REDIS_CONNECT_TIMEOUT
+            - name: REDIS_COMMAND_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: REDIS_COMMAND_TIMEOUT
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: AUDIT_SERVICE_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudpilot-config
+                  key: AUDIT_SERVICE_BASE_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cloudpilot-secrets
+                  key: JWT_SECRET
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 8081
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8081
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8081
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3

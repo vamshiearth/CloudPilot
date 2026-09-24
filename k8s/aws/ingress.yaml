@@ -6,11 +6,14 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:296062568732:certificate/9b36cd88-8107-44a7-81b7-ab11a55962a2
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
 spec:
   ingressClassName: alb
   rules:
-    - http:
+    - host: app.cloudpilot-vamshi.mywire.org
+      http:
         paths:
           - path: /
             pathType: Prefix

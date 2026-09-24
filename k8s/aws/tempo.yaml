@@ -1,0 +1,192 @@
+# ==================================================
+# Tempo Configuration
+# ==================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-config
+  namespace: cloudpilot
+
+data:
+  tempo.yaml: |
+    stream_over_http_enabled: true
+
+    server:
+      http_listen_port: 3200
+
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: "0.0.0.0:4317"
+
+            http:
+              endpoint: "0.0.0.0:4318"
+
+    metrics_generator:
+      registry:
+        collection_interval: 15s
+
+        external_labels:
+          source: tempo
+          cluster: cloudpilot
+
+      storage:
+        path: /data/tempo/generator/wal
+
+        remote_write_add_org_id_header: false
+
+        remote_write:
+          - url: http://prometheus:9090/api/v1/write
+            send_exemplars: true
+
+    overrides:
+      defaults:
+        metrics_generator:
+          processors:
+            - service-graphs
+            - span-metrics
+
+    storage:
+      trace:
+        backend: local
+
+        wal:
+          path: /data/tempo/wal
+
+        local:
+          path: /data/tempo/blocks
+
+    usage_report:
+      reporting_enabled: false
+
+---
+# ==================================================
+# Tempo Service
+# ==================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo
+  namespace: cloudpilot
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: tempo
+
+  ports:
+    - name: http
+      port: 3200
+      targetPort: 3200
+
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+
+---
+# ==================================================
+# Tempo Persistent Storage
+# ==================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tempo-data
+  namespace: cloudpilot
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: cloudpilot-gp3
+
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# ==================================================
+# Tempo Deployment
+# ==================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  namespace: cloudpilot
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tempo
+
+  template:
+    metadata:
+      labels:
+        app: tempo
+
+    spec:
+      containers:
+        - name: tempo
+          image: grafana/tempo:3.0.3
+          imagePullPolicy: IfNotPresent
+
+          args:
+            - "-config.file=/etc/tempo/tempo.yaml"
+
+          ports:
+            - name: http
+              containerPort: 3200
+
+            - name: otlp-grpc
+              containerPort: 4317
+
+            - name: otlp-http
+              containerPort: 4318
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/tempo/tempo.yaml
+              subPath: tempo.yaml
+              readOnly: true
+
+            - name: tempo-data
+              mountPath: /data/tempo
+
+          startupProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            periodSeconds: 3
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 3200
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+      volumes:
+        - name: config
+          configMap:
+            name: tempo-config
+
+        - name: tempo-data
+          persistentVolumeClaim:
+            claimName: tempo-data
