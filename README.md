@@ -2,6 +2,12 @@
 
 CloudPilot is a multi-tenant SaaS operations platform for teams that need to plan work, manage access, understand usage, and operate services with better visibility. It combines project delivery, team administration, subscriptions, cost intelligence, audit history, and observability in one application.
 
+## Live Application
+
+CloudPilot is publicly available over HTTPS at [https://app.cloudpilot-vamshi.mywire.org](https://app.cloudpilot-vamshi.mywire.org).
+
+The live AWS deployment uses an internet-facing Application Load Balancer with an ACM-managed TLS certificate, HTTP-to-HTTPS redirection, and the same tenant-aware authentication and authorization flow described below.
+
 ## What CloudPilot provides
 
 - **Work management:** Create projects, assign tasks, track status, and keep delivery visible.
@@ -12,7 +18,7 @@ CloudPilot is a multi-tenant SaaS operations platform for teams that need to pla
 - **Observability:** Inspect Prometheus metrics, Grafana dashboards, and OpenTelemetry traces through Tempo.
 - **Noisy-neighbor signals:** Identify disproportionate tenant workload without throttling or changing tenant traffic.
 - **Multi-tenant security:** Derive tenant context from the authenticated server-side principal and enforce permissions at the API boundary.
-- **Deployment options:** Run locally with Docker Compose or use the included Kubernetes and Terraform foundations for a planned AWS deployment.
+- **Deployment options:** Run locally with Docker Compose or deploy with the included Kubernetes and Terraform foundations. The current live environment runs on AWS EKS.
 
 ## How the application is used
 
@@ -251,4 +257,4 @@ The showcase configuration keeps NAT Gateway, MSK, RDS, and ElastiCache out of t
 
 ## Status
 
-CloudPilot is an active project prototype. Review the configuration, security controls, persistence choices, and observability retention before exposing it to production traffic.
+CloudPilot is an active project prototype with a validated public AWS deployment. Review the configuration, security controls, persistence choices, and observability retention before using it for production traffic.
