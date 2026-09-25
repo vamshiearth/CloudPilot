@@ -30,7 +30,7 @@ spec:
       serviceAccountName: cloudpilot-core
       containers:
         - name: core-backend
-          image: 296062568732.dkr.ecr.us-east-1.amazonaws.com/cloudpilot-dev-core-backend:69ab67a
+          image: 735058419920.dkr.ecr.us-east-1.amazonaws.com/cloudpilot-dev-core-backend:837554d
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

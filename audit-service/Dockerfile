@@ -33,7 +33,8 @@ RUN apk add --no-cache curl \
 # ==============================
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl \
+	&& apk upgrade --no-cache expat
 
 WORKDIR /app
 

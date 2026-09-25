@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 296062568732.dkr.ecr.us-east-1.amazonaws.com/cloudpilot-dev-frontend:69ab67a
+          image: 735058419920.dkr.ecr.us-east-1.amazonaws.com/cloudpilot-dev-frontend:837554d
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -40,3 +40,17 @@ spec:
             periodSeconds: 20
             timeoutSeconds: 3
             failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: cloudpilot
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: ClusterIP

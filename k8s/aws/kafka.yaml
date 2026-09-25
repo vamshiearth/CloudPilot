@@ -81,7 +81,7 @@ spec:
               value: "/tmp/kraft/kraft-combined-logs"
           volumeMounts:
             - name: kafka-data
-              mountPath: /tmp/kraft
+              mountPath: /tmp/kraft-combined-logs
           startupProbe:
             exec:
               command: ["/bin/sh", "-c", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]

@@ -8,7 +8,8 @@ RUN npm run build
 
 FROM nginx:1.31.6-alpine3.24
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl \
+	&& apk upgrade --no-cache expat
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html

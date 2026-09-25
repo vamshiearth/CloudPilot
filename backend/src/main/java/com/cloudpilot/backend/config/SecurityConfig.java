@@ -56,6 +56,7 @@ public class SecurityConfig {
                                         "/api/auth/register",
                                         "/api/auth/login",
                                         "/api/invitations/**",
+                                        "/error",
                                         "/actuator/health",
                                         "/actuator/metrics",
                                         "/actuator/metrics/**",
@@ -98,7 +99,8 @@ public class SecurityConfig {
                 List.of(
                         "http://localhost:5173",
                         "http://localhost:3000",
-                        "http://localhost:30000"
+                        "http://localhost:30000",
+                        "https://app.cloudpilot-vamshi.mywire.org"
                 )
         );
 
