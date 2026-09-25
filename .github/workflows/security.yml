@@ -152,7 +152,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Core image
-        run: docker build -t cloudpilot-core:security ./backend
+        run: docker build --pull -t cloudpilot-core:security ./backend
 
       - name: Scan Core image
         uses: aquasecurity/trivy-action@master
@@ -172,7 +172,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Audit image
-        run: docker build -t cloudpilot-audit:security ./audit-service
+        run: docker build --pull -t cloudpilot-audit:security ./audit-service
 
       - name: Scan Audit image
         uses: aquasecurity/trivy-action@master
@@ -192,7 +192,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Frontend image
-        run: docker build -t cloudpilot-frontend:security ./frontend
+        run: docker build --pull -t cloudpilot-frontend:security ./frontend
 
       - name: Scan Frontend image
         uses: aquasecurity/trivy-action@master
