@@ -2,11 +2,11 @@
 
 CloudPilot is a multi-tenant SaaS operations platform for teams that need to plan work, manage access, understand usage, and operate services with better visibility. It combines project delivery, team administration, subscriptions, cost intelligence, audit history, and observability in one application.
 
-## Live Application
+## Deployment Status
 
-CloudPilot is publicly available over HTTPS at [https://app.cloudpilot-vamshi.mywire.org](https://app.cloudpilot-vamshi.mywire.org).
+CloudPilot is not currently live on AWS. The temporary AWS EKS deployment was destroyed after validation to prevent ongoing infrastructure charges. The former public URL is therefore unavailable until the infrastructure is provisioned and the application is redeployed again.
 
-The live AWS deployment uses an internet-facing Application Load Balancer with an ACM-managed TLS certificate, HTTP-to-HTTPS redirection, and the same tenant-aware authentication and authorization flow described below.
+The repository still contains the Docker, Kubernetes, Terraform, and GitHub Actions foundations for a future deployment. No AWS resources are created automatically by cloning this repository.
 
 ## What CloudPilot provides
 
@@ -76,6 +76,8 @@ docker compose up -d --build
 ```
 
 Open the application at [http://localhost:3000](http://localhost:3000/).
+
+This is the recommended local run path. It starts the frontend, Core Backend, Audit Service, PostgreSQL databases, Redis, and Kafka together without using AWS.
 
 Useful commands:
 
@@ -209,6 +211,36 @@ The detector state is pod-local and resets when Core restarts. A multi-replica p
 
 ## Development
 
+### Run services without Docker
+
+Docker Compose is recommended because the backend depends on PostgreSQL, Redis, and Kafka. If those services are already running locally, start the Core Backend and frontend separately:
+
+Start the Core Backend in one terminal:
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+
+Start the frontend in another terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+The Vite development server normally opens at [http://localhost:5173](http://localhost:5173/). The backend runs at `http://localhost:8081` when started through the Compose environment; check the active configuration if running it directly.
+
+### Local prerequisites
+
+- Docker Desktop with Docker Compose
+- Node.js and npm for frontend development
+- Java 21 for running the backend directly
+- Maven is not required when using the checked-in Maven wrapper
+
+### Build and validate
+
 Build the frontend:
 
 ```bash
@@ -241,7 +273,7 @@ terraform/      Planned AWS infrastructure
 
 ## Terraform AWS foundation
 
-The `terraform/` directory describes a planned AWS deployment. It has been validated as infrastructure code, but `terraform apply` has not been run and no AWS resources are created by this repository automatically.
+The `terraform/` directory describes the AWS deployment foundation. It was used for a temporary EKS deployment, which has now been destroyed. The configuration remains available for a future, intentional deployment, but `terraform apply` can create billable AWS resources and must not be run casually.
 
 The plan includes:
 
@@ -257,4 +289,4 @@ The showcase configuration keeps NAT Gateway, MSK, RDS, and ElastiCache out of t
 
 ## Status
 
-CloudPilot is an active project prototype with a validated public AWS deployment. Review the configuration, security controls, persistence choices, and observability retention before using it for production traffic.
+CloudPilot is an active project prototype. The AWS environment is intentionally offline to avoid recurring EKS, compute, load balancer, networking, storage, and related charges. Use Docker Compose for local development. Review the configuration, security controls, persistence choices, and observability retention before creating another production deployment.

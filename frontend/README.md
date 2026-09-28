@@ -1,4 +1,24 @@
-# React + TypeScript + Vite
+# CloudPilot Frontend
+
+React and TypeScript frontend for CloudPilot, powered by Vite.
+
+## Local development
+
+```powershell
+npm install
+npm run dev
+```
+
+Open the Vite URL shown in the terminal, normally `http://localhost:5173`.
+
+For the complete local environment, including PostgreSQL, Redis, Kafka, the Core Backend, and Audit Service, use the repository-level Docker Compose instructions in [../README.md](../README.md).
+
+## Checks
+
+```powershell
+npm run build
+npm run lint
+```
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
